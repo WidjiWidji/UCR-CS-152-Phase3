@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "lib.h"
+#include <string>
+
+using namespace std;
 
 extern FILE * yyin;
 extern int currLine;
@@ -13,6 +16,62 @@ void yyerror(const char *msg);
 extern int yylex();
 
 
+struct CodeNode{
+  string code;
+  string name;
+};
+
+int temp_count = 0;
+string new_temp(){
+  string ret = "_temp" + to_string(temp_count);
+  install(ret);
+  temp_count++;
+  return ret;
+}
+
+struct symtable {
+  struct CodeNode *code;
+  struct symtable *next;
+};
+
+/* add symbol to table function*/
+symtable* add_symbol(string sym_name){
+  symtable *p;
+  p = (symtable *) malloc (sizeof(symtable));
+  p->name = (string) malloc (strlen(sym_name) + 1);
+  strcpy(p->name, sym_name);
+  p->next = (struct symtable *)symbol_table;
+  symbol_table = p;
+  return p;
+}
+
+/*lookup symbol table function*/
+symtable* lookup(string sym_name){
+  symtable *p;
+  p = (symtable *) malloc (sizeof(symtable));
+  p->name = (string) malloc (strlen(sym_name)+1);
+  strcpy(p->name, sym_name);
+  p->next = (struct symtable *) symbol_table;
+  symbol_table = p;
+  return p;
+}
+
+/* install symbol into table*/
+void install(string sym_name){
+  symtable *s;
+  s = lookup(sym_name);
+  if(s==0){
+    s = add_symbol(sym_name);
+  }else{
+    printf("Error line %d: symbol %s multiply-defined\n", currLine, sym_name);
+  }
+}
+
+void context_check(string syn_name){
+  if(lookup(sym_name) == 0){
+    printf("Error line %d: %s is an undeclared identifier \n", currLine, sym_name);
+  }
+}
 
 %}
 
@@ -21,6 +80,8 @@ extern int yylex();
 
   int ival;
   char *sval;
+
+
 }
 
 %error-verbose
@@ -41,7 +102,7 @@ prog: functions
 
 
 functions: function functions
-             {}
+           {}
          | 
            {}
 
@@ -74,7 +135,16 @@ declaration: identifiers COLON INTEGER
 	       {}
 
 identifiers: IDENT
-               {}
+               {
+                 CodeNode *node = new CodeNode;
+                 node->code = "";
+                 node->name = $1;
+                 string error;
+                 if(!find(node->name, NUMBER, error)){
+                   yyerror(error.c_str());
+                 }
+                 $$ = node;
+               }
 
 
 statements-recur: statements statements-recur
@@ -89,7 +159,17 @@ statements: statement SEMICOLON
 
 
 statement: var ASSIGN expression
-             { }
+             { 
+               string var_name = $1;
+               string error;
+               if(!find(var_name, NUMBER, error)){
+                 yyerror(error.c_str());
+               }
+               CodeNode *node = new CodeNode;
+               node->code = $3->code;
+               node->code += string("= ") + var_name + string(", ") + $3->name + string("\n");;
+               $$ = node;
+             }
          | IF bool-exp THEN statements-recur ENDIF
              {}
          | IF bool-exp THEN statements-recur ELSE statements-recur ENDIF
@@ -128,7 +208,8 @@ comp:
 	| GTE {}
 
 
-expression: multiplicative-expr multiplicative-expr-recur {} 
+expression: multiplicative-expr multiplicative-expr-recur {
+} 
  
 
 multiplicative-expr-recur: PLUS multiplicative-expr multiplicative-expr-recur {}
@@ -164,7 +245,16 @@ expression-recur: COMMA expression expression-recur {}
 
 
 var: identifiers
-	{}
+	{
+    CodeNode *node = new CodeNode;
+    node->code = "";
+    node->name = $1;
+    string error;
+    if(!find(node->name, NUMBER, error)){
+      yyerror(error.c_str());
+    }
+    $$ = node;
+  }
 	| identifiers L_BRACKET expression R_BRACKET {}
 
 %% 
@@ -178,3 +268,4 @@ void yyerror(const char *msg) {
     /* implement your error handling */ 
 	printf("Error: On line %d, column %d: %s \n", currLine, currPos, msg); 
 }
+
