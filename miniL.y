@@ -156,7 +156,13 @@ declarations: declaration SEMICOLON declarations
 
 
 declaration: identifiers COLON INTEGER
-               { printf("declaration -> identifiers COLON INTEGER\n"); }
+               { 
+                 printf("declaration -> identifiers COLON INTEGER\n"); 
+                 string value = $1;
+                 Type t = Integer;
+                 add_variable_to_symbol_table(value, t);
+                 out
+               }
 	   | identifiers COLON ARRAY L_BRACKET number R_BRACKET OF INTEGER
 	       { printf("declaration -> identifiers COLON ARRAY L_BRACKET number R_BRACKET OF INTEGER\n"); }
 
