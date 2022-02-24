@@ -19,6 +19,8 @@ char *ident_token;
 int number_token;
 int count = 0;
 
+vector<string> hold;
+
 enum Type {Integer, Array};
 struct Symbol{
   string name;
@@ -30,6 +32,7 @@ struct Function{
 }
 
 vector <Function> symbol_table;
+stringstream output;
 
 
 Function *get_function() {
@@ -134,11 +137,32 @@ functions: function functions
 
 
 function: FUNCTION identifiers SEMICOLON params locals body
-            { printf("function -> FUNCTION identifiers SEMICOLON params locals body\n"); }
+            { printf("function -> FUNCTION identifiers SEMICOLON params locals body\n");
+            string f = $2;
+            add_function_to_symbol_table(f);
+            output << "func " << f << endl; 
+            }
 
 
 params: BEGIN_PARAMS declarations END_PARAMS
-          { printf("params -> BEGIN_PARAMS declarations END_PARAMS\n"); }
+          { 
+            int count = 0;
+            string temp = "";
+            for(int i = 0; i < symbol_table.size(); i++){
+              for(int j = 0; j < symbol_table[i].size(); j++){
+                temp = symbol_table[i].declarations[j].name.c_str();
+
+                if(hold.size() == 0) hold.push_back(temp);
+                if(find(hold.begin(), hold.end(), temp) != hold.end()){
+                  printf("= %s, $%d \n", symbol_table[i].declarations[j].name.c_str(), count);
+                  hold.push_back(temp);
+                  output << "= " << temp << ", $" << count++ << endl;
+                }
+              }
+              temp ="";
+            }
+            printf("params -> BEGIN_PARAMS declarations END_PARAMS\n"); 
+          }
 
 
 locals: BEGIN_LOCALS declarations END_LOCALS
