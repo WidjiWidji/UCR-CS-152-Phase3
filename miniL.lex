@@ -1,5 +1,5 @@
    /* cs152-miniL */
-
+%option noyywrap
 %{
    /* write your C code here for defination of variables and including headers */
 #include "miniL-parser.hpp"
@@ -7,6 +7,9 @@
 //for miniL.y error handling
 int currLine = 1;
 int currPos = 0;
+
+extern char *identToken;
+extern int numberToken;
 
 %}
 
@@ -82,12 +85,26 @@ INVALID_IDENT2	{LETTER}({ALPHANUM}|{UNDERSCORE})*{UNDERSCORE}
 
 {COMMENT}	{currPos += yyleng;}
 
-{DIGIT}+	{currPos += yyleng; yylval.ival = atoi(yytext); return NUMBER; }
-{IDENTIFIER}	{currPos += yyleng; yylval.sval = yytext; return IDENT; }
+{DIGIT}+	{
+   currPos += yyleng; 
+   yylval.ival = atoi(yytext); 
+   char * token = new char[yyleng];
+   strcpy(token, yytext);
+   yylval.op_val = token;
+   return NUMBER; 
+   }
+{IDENTIFIER}	{
+   currPos += yyleng; 
+   yylval.sval = strdup(yytext);
+   char * token = new char [yyleng];
+   strcpy(token, yytext);
+   yyval.op_val = token;
+   return IDENT; 
+   }
 
 {INVALID_IDENT1}	{printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(1);}
 {INVALID_IDENT2}	{printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currLine, currPos, yytext); exit(1);}
-  
+
 . {printf("Error at line %d, col %d : unrecognized symbol  %s \n", currLine, currPos, yytext); exit(1);}
 %%
 	/* C functions used in lexer */

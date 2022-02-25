@@ -109,7 +109,7 @@ string new_body(){
 
   int ival;
   char *sval;
-
+  char *op_val;
 
 }
 
@@ -118,9 +118,9 @@ string new_body(){
 
 /* %start program */
 %start prog
-
-%token <ival> NUMBER
-%token <sval> FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY INTEGER ARRAY OF IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE BREAK READ WRITE NOT RETURN SUB PLUS MULT DIV MOD EQ NEQ LT GT LTE GTE SEMICOLON COLON COMMA L_PAREN R_PAREN L_BRACKET R_BRACKET ASSIGN IDENT TRUE FALSE
+%token FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY INTEGER ARRAY OF IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE BREAK READ WRITE NOT RETURN SUB PLUS MULT DIV MOD EQ NEQ LT GT LTE GTE SEMICOLON COLON COMMA L_PAREN R_PAREN L_BRACKET R_BRACKET ASSIGN TRUE FALSE
+%token <op_val> NUMBER
+%token <op_val> IDENT
 
 %% 
 
@@ -170,7 +170,10 @@ locals: BEGIN_LOCALS declarations END_LOCALS
 
 
 body: BEGIN_BODY statements-recur END_BODY
-        { printf("body -> BEGIN_BODY statements END_BODY\n"); }
+        { 
+          printf("body -> BEGIN_BODY statements END_BODY\n"); 
+          output << "endfunc " << endl;
+          }
 
 
 declarations: declaration SEMICOLON declarations
@@ -185,10 +188,13 @@ declaration: identifiers COLON INTEGER
                  string value = $1;
                  Type t = Integer;
                  add_variable_to_symbol_table(value, t);
-                 out
+                 output << ". " << value << endl;
                }
 	   | identifiers COLON ARRAY L_BRACKET number R_BRACKET OF INTEGER
-	       { printf("declaration -> identifiers COLON ARRAY L_BRACKET number R_BRACKET OF INTEGER\n"); }
+	       { 
+           
+           printf("declaration -> identifiers COLON ARRAY L_BRACKET number R_BRACKET OF INTEGER\n"); 
+          }
 
 identifiers: IDENT
                { 
