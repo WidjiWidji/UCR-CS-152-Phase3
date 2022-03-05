@@ -86,20 +86,14 @@ INVALID_IDENT2	{LETTER}({ALPHANUM}|{UNDERSCORE})*{UNDERSCORE}
 {COMMENT}	{currPos += yyleng;}
 
 {DIGIT}+	{
-   currPos += yyleng; 
    yylval.ival = atoi(yytext); 
-   char * token = new char[yyleng];
-   strcpy(token, yytext);
-   yylval.op_val = token;
    return NUMBER; 
+   currPos += yyleng; 
    }
 {IDENTIFIER}	{
-   currPos += yyleng; 
    yylval.sval = strdup(yytext);
-   char * token = new char [yyleng];
-   strcpy(token, yytext);
-   yyval.op_val = token;
-   return IDENT; 
+   return IDENT;
+   currPos += yyleng;  
    }
 
 {INVALID_IDENT1}	{printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(1);}
