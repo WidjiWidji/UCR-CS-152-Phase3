@@ -62,13 +62,13 @@ string new_temp();
   /* write your rules here */
   
 prog: functions
-        { printf("prog -> functions\n"); 
+        { //printf("prog -> functions\n"); 
           cout << $1.code;
         }
 
 
 functions: function functions
-             { printf ("functions -> function functions\n"); 
+             { //printf ("functions -> function functions\n"); 
                 stringstream ss;
                 ss << $1.code << $2.code;
                 string temp = ss.str();
@@ -76,14 +76,14 @@ functions: function functions
                 $$.ret_name = (char*)"";
              }
          | 
-           { printf("functions -> epsilon\n"); 
+           { //printf("functions -> epsilon\n"); 
               $$.code = (char*)"";
               $$.ret_name = (char*)"";
            }
 
 
 function: FUNCTION identifiers SEMICOLON params locals body
-            { printf("function -> FUNCTION identifiers SEMICOLON params locals body\n");
+            { //printf("function -> FUNCTION identifiers SEMICOLON params locals body\n");
               stringstream ss;
               ss << "func ";
               if(pdFunctions.find($2.ret_name) != pdFunctions.end()){
@@ -97,7 +97,7 @@ function: FUNCTION identifiers SEMICOLON params locals body
 
 params: BEGIN_PARAMS declarations END_PARAMS
           { 
-            printf("params -> BEGIN_PARAMS declarations END_PARAMS\n"); 
+            //printf("params -> BEGIN_PARAMS declarations END_PARAMS\n"); 
             stringstream ss;
             ss << $2.code;
             int count = 0;
@@ -118,18 +118,18 @@ params: BEGIN_PARAMS declarations END_PARAMS
 
 
 locals: BEGIN_LOCALS declarations END_LOCALS
-          { printf("locals -> BEGIN_LOCALS declarations END_LOCALS\n"); }
+          { //printf("locals -> BEGIN_LOCALS declarations END_LOCALS\n"); }
 
 
 body: BEGIN_BODY statements-recur END_BODY
         { 
-          printf("body -> BEGIN_BODY statements END_BODY\n"); 
+          //printf("body -> BEGIN_BODY statements END_BODY\n"); 
           }
 
 
 declarations: declaration SEMICOLON declarations
                 { 
-                  printf("declarations -> declaration SEMICOLON declarations\n"); 
+                  //printf("declarations -> declaration SEMICOLON declarations\n"); 
                   stringstream ss;
                   ss << $1.code << $3.code;
                   string temp = ss.str();
@@ -138,7 +138,7 @@ declarations: declaration SEMICOLON declarations
                 }
             |
               { 
-                printf("declarations -> epsilon\n");
+                //printf("declarations -> epsilon\n");
                 $$.code = (char*)"";
                 $$.ret_name = (char*)"";
                }
@@ -146,7 +146,7 @@ declarations: declaration SEMICOLON declarations
 
 declaration: identifiers COLON INTEGER
                { 
-                 printf("declaration -> identifiers COLON INTEGER\n"); 
+                 //printf("declaration -> identifiers COLON INTEGER\n"); 
                  stringstream ss;
                  string ident;
                  string sIdents = $1.ret_name;
@@ -161,7 +161,7 @@ declaration: identifiers COLON INTEGER
                }
 	   | identifiers COLON ARRAY L_BRACKET number R_BRACKET OF INTEGER
 	       { 
-           printf("declaration -> identifiers COLON ARRAY L_BRACKET number R_BRACKET OF INTEGER\n"); 
+           //printf("declaration -> identifiers COLON ARRAY L_BRACKET number R_BRACKET OF INTEGER\n"); 
            stringstream ss;
            string s;
            string temp = $1.code;
@@ -175,26 +175,26 @@ declaration: identifiers COLON INTEGER
 
 identifiers: IDENT
                { 
-                 printf("identifiers -> IDENT %s\n", $1); 
+                 //printf("identifiers -> IDENT %s\n", $1); 
                  $$.code = (char*)"";
                  $$.ret_name = $1;
                }
 
 
 statements-recur: statements statements-recur
-                    { printf("statements-recur -> statements statements-recur\n"); }
+                    { //printf("statements-recur -> statements statements-recur\n"); }
                 |
-                  { printf("statements-recur -> epsilon\n"); }
+                  { //printf("statements-recur -> epsilon\n"); }
 
 
 statements: statement SEMICOLON
-              { printf("statements -> statement SEMICOLON\n"); }
+              { //printf("statements -> statement SEMICOLON\n"); }
 
 
 
 statement: var ASSIGN expression
              { 
-               printf("statement -> var ASSIGN expression\n"); 
+               //printf("statement -> var ASSIGN expression\n"); 
                stringstream ss;
                ss << $1.code;
                ss << $3.code;
@@ -202,7 +202,7 @@ statement: var ASSIGN expression
              }
          | IF bool-exp THEN statements-recur ENDIF
              { 
-               printf("statement -> IF bool-exp THEN statements-recur ENDIF\n"); 
+               //printf("statement -> IF bool-exp THEN statements-recur ENDIF\n"); 
                string l0 = new_label();
                string l1 = new_label();
                stringstream ss;
@@ -217,7 +217,7 @@ statement: var ASSIGN expression
                }
          | IF bool-exp THEN statements-recur ELSE statements-recur ENDIF
              { 
-               printf("statement -> IF bool-exp THEN statements-recur ELSE statements-recur ENDIF\n"); 
+               //printf("statement -> IF bool-exp THEN statements-recur ELSE statements-recur ENDIF\n"); 
                string l0 = new_label();
                string l1 = new_label();
                string l2 = new_label();
@@ -234,28 +234,28 @@ statement: var ASSIGN expression
                $$.code = const_cast<char*>(ss.str().c_str());
                }
          | WHILE bool-exp BEGINLOOP statements-recur ENDLOOP
-             { printf("statement -> WHILE bool-exp BEGINLOOP  statements-recur ENDLOOP\n"); }
+             { //printf("statement -> WHILE bool-exp BEGINLOOP  statements-recur ENDLOOP\n"); }
          | DO BEGINLOOP statements-recur ENDLOOP WHILE bool-exp
-             { printf("statement -> DO BEGINLOOP statements-recur ENDLOOP WHILE bool-exp\n"); }
+             { //printf("statement -> DO BEGINLOOP statements-recur ENDLOOP WHILE bool-exp\n"); }
          | READ var
-             { printf("statement -> READ var\n"); }
+             { //printf("statement -> READ var\n"); }
          | WRITE var
-             { printf("statement -> WRITE var\n"); }
+             { //printf("statement -> WRITE var\n"); }
          | CONTINUE
-             { printf("statement -> CONTINUE\n"); }
+             { //printf("statement -> CONTINUE\n"); }
          | BREAK
-             { printf("statement -> BREAK\n"); }
+             { //printf("statement -> BREAK\n"); }
          | RETURN expression
-             { printf("statement -> RETURN expression\n");} 
+             { //printf("statement -> RETURN expression\n");} 
 
 
 bool-exp: not expression comp expression
-		{printf("bool-exp -> not expression comp expression\n");}
+		{ //printf("bool-exp -> not expression comp expression\n"); }
 
 
 not: NOT not
 	{
-    printf("not -> NOT not\n");
+    //printf("not -> NOT not\n");
     string temp = new_temp();
     stringstream ss;
     ss << "! " << temp << ", ";
@@ -264,46 +264,46 @@ not: NOT not
   }
      |
 	{
-    printf("not -> epsilon\n");
+    //printf("not -> epsilon\n");
     $$.code = (char*)"";
     $$.ret_name = (char*)"";
   }
 
 comp:
 	 EQ {
-     printf("comp -> EQ\n");
+     //printf("comp -> EQ\n");
      $$.ret_name = (char*)"== ";
      $$.code = (char*)"";
      }
 	| NEQ {
-    printf("comp -> NEQ\n");
+    //printf("comp -> NEQ\n");
     $$.ret_name = (char*)"!= ";
     $$.code = (char*)"";
     }
 	| LT {
-    printf("comp -> LT\n");
+    //printf("comp -> LT\n");
     $$.ret_name = (char*) "< ";
     $$.code = (char*) "";
     }
 	| GT {
-    printf("comp -> GT\n");
+    //printf("comp -> GT\n");
     $$.ret_name = (char*) "> ";
     $$.code = (char*) "";
     }
 	| LTE {
-    printf("comp -> LTE\n");
+    //printf("comp -> LTE\n");
     $$.ret_name = (char*) "<= ";
     $$.code = (char*)"";
     }
 	| GTE {
-    printf("comp -> GTE\n");
+    //printf("comp -> GTE\n");
     $$.ret_name = (char*) ">= ";
     $$.code = (char*)"";
     }
 
 
 expression: multiplicative-expr {
-  printf("expression -> multiplicative-expr multiplicative-expr-recur\n");
+  //printf("expression -> multiplicative-expr multiplicative-expr-recur\n");
   $$.code = (char*) $1.code;
   $$.ret_name = (char*) $1.ret_name;
   } 
@@ -389,27 +389,27 @@ multiplicative-expr: term{
 //   }
 
 // term-recur:
-// 	MULT term term-recur {printf("term-recur -> MULT term term-recur\n");}
-// 	| DIV term term-recur {printf("term-recur -> DIV term term-recur\n");}
-// 	| MOD term term-recur {printf("term-recur -> MOD term term-recur\n");}
+// 	MULT term term-recur { //printf("term-recur -> MULT term term-recur\n"); }
+// 	| DIV term term-recur { //printf("term-recur -> DIV term term-recur\n"); }
+// 	| MOD term term-recur { //printf("term-recur -> MOD term term-recur\n"); }
 // 	|
-// 	  {printf("term-recur -> epsilon\n");}
+// 	  { //printf("term-recur -> epsilon\n"); }
 */
 
 term:
-	 var {printf("term -> var\n");}
+	 var { //printf("term -> var\n"); }
 	| number {
-    printf("term -> number\n");
+    //printf("term -> number\n");
     stringstream ss;
     ss << $1.ret_name;
     $$.ret_name = const_cast<char*>(ss.str().c_str());
     $$.code = (char*) "";
     }
 	| L_PAREN expression R_PAREN {
-    printf("term -> L_PAREN expression R_PAREN\n");
+    //printf("term -> L_PAREN expression R_PAREN\n");
     }
 	| identifiers L_PAREN expressions R_PAREN {
-    printf("term-> identifiers L_PAREN expression expression-recur R_PAREN\n");
+    //printf("term-> identifiers L_PAREN expression expression-recur R_PAREN\n");
     string temp = new_temp();
     stringstream ss;
     ss << $3.code;
@@ -417,14 +417,14 @@ term:
     }
 
 
-parameters: expression expressions {printf("parameters -> expression expression-recur\n");}
+parameters: expression expressions { //printf("parameters -> expression expression-recur\n"); }
 	| 
-          {printf("parameters -> epsilon\n");}
+          { //printf("parameters -> epsilon\n"); }
 
 
 
 number: NUMBER {
-  printf("number -> NUMBER %d\n", $1);
+  //printf("number -> NUMBER %d\n", $1);
   $$.ret_name = const_cast<char*>(to_string($1).c_str());
   $$.code = (char*)"";
   }
@@ -454,12 +454,12 @@ expressions: expression COMMA expressions {
 
 var: identifiers
 	{
-    printf("var ->  identifiers\n");
+    //printf("var ->  identifiers\n");
     $$.code = (char*)"";
     $$.ret_name = $1.ret_name;
   }
 	| identifiers L_BRACKET expression R_BRACKET {
-    printf("var -> identifiers L_BRACKET expression R_BRACKET\n");
+    //printf("var -> identifiers L_BRACKET expression R_BRACKET\n");
     stringstream ss;
     ss << $3.code;
     ss << $1.ret_name;
